@@ -13,8 +13,8 @@ steps:
   export-artifacts:
     image: alpine
     environment:
-      - CI_REPO_NAME
-      - CI_BUILD_NUMBER
+        CI_REPO_NAME: ${CI_REPO_NAME}
+        CI_BUILD_NUMBER: ${CI_BUILD_NUMBER}
     volumes:
       - /ci-shared:/ci-shared
     commands:
