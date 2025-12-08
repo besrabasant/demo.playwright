@@ -1,0 +1,26 @@
+when:
+  event:
+    - manual
+
+steps:
+  run-tests:
+    image: mcr.microsoft.com/playwright:v1.48.0-jammy
+    commands:
+      - npm ci || yarn install || pnpm install
+      - npx playwright install --with-deps
+      - npx playwright test --config basic/playwright.config.ts --reporter=json,html
+
+  export-artifacts:
+    image: alpine
+    environment:
+      - CI_REPO_NAME
+      - CI_BUILD_NUMBER
+    volumes:
+      - /ci-shared:/ci-shared
+    commands:
+      - mkdir -p "/ci-shared/playwright/${CI_REPO_NAME}/build-${CI_BUILD_NUMBER}"
+      - cp test-results.json "/ci-shared/playwright/${CI_REPO_NAME}/build-${CI_BUILD_NUMBER}/summary.json" || true
+      - cp -r playwright-report "/ci-shared/playwright/${CI_REPO_NAME}/build-${CI_BUILD_NUMBER}/playwright-report" || true
+
+    depends_on:
+      - run-tests
