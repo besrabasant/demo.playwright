@@ -15,6 +15,7 @@ steps:
     environment:
         CI_REPO_NAME: ${CI_REPO_NAME}
         CI_BUILD_NUMBER: ${CI_BUILD_NUMBER}
+    privileged: true
     volumes:
       - /ci-shared:/ci-shared
     commands:
