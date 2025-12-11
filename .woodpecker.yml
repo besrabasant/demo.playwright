@@ -12,8 +12,9 @@ steps:
       - npm ci || yarn install || pnpm install
       - npx playwright install --with-deps
       - npx playwright test --config basic/playwright.config.ts --reporter=json,html > test-results.json
-
-      - ARTIFACT_DIR="repos/${CI_REPO_ID}/builds/${CI_BUILD_NUMBER}/artifacts"
+      - echo $CI_REPO_ID
+      - echo $CI_BUILD_NUMBER
+      - ARTIFACT_DIR="repos/$CI_REPO_ID/builds/$CI_BUILD_NUMBER/artifacts"
       - mkdir -p "$ARTIFACT_DIR"
 
       - cp test-results.json "$ARTIFACT_DIR/summary.json" 2>/dev/null || true
@@ -27,7 +28,7 @@ steps:
       access_key: manaable
       secret_key: manaable
       source: repos/**/*
-      target: repos/
+      target: /
       path_style: true
       endpoint: http://192.168.1.15:9001
 
