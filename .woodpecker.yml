@@ -9,16 +9,8 @@ steps:
       CI_REPO_ID: ${CI_REPO_REMOTE_ID}
       CI_BUILD_NUMBER: ${CI_PIPELINE_NUMBER}
     commands:
-      - npm ci || yarn install || pnpm install
-      - npx playwright install --with-deps
-      - npx playwright test --config basic/playwright.config.ts
-      - echo $CI_REPO_ID
-      - echo $CI_BUILD_NUMBER
-      - ARTIFACT_DIR="repos/$CI_REPO_ID/builds/$CI_BUILD_NUMBER/artifacts"
-      - mkdir -p "$ARTIFACT_DIR"
-
-      - cp test-results.json "$ARTIFACT_DIR/summary.json" 2>/dev/null || true
-      - cp -R playwright-report "$ARTIFACT_DIR/" 2>/dev/null || true
+      - chmod +x scripts/run_playwright.sh
+      - ./scripts/run_playwright.sh "$CI_REPO_ID" "$CI_BUILD_NUMBER"
     failure: ignore
 
   upload:
