@@ -3,3 +3,5 @@ node_modules/
 **/playwright-report/
 **/lighthouse/
 package-lock.json
+report.json
+report*.json

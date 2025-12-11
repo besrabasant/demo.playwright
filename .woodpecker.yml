@@ -5,26 +5,44 @@ when:
 steps:
   run-tests:
     image: mcr.microsoft.com/playwright:v1.48.0-jammy
+    environment:
+      CI_REPO_ID: ${CI_REPO_REMOTE_ID}
+      CI_BUILD_NUMBER: ${CI_PIPELINE_NUMBER}
     commands:
       - npm ci || yarn install || pnpm install
       - npx playwright install --with-deps
-      - npx playwright test --config basic/playwright.config.ts --reporter=json,html
-      # TEMP DEBUG – list again after test run
-      - echo "--- After tests ---"
-      - ls -R .
+      - npx playwright test --config basic/playwright.config.ts --reporter=json,html > test-results.json
 
-  export-artifacts:
-    image: alpine
-    environment:
-        CI_REPO_NAME: ${CI_REPO_NAME}
-        CI_BUILD_NUMBER: ${CI_BUILD_NUMBER}
-    privileged: true
-    volumes:
-      - /ci-shared:/ci-shared
-    commands:
-      - mkdir -p "/ci-shared/playwright/${CI_REPO_NAME}/build-${CI_BUILD_NUMBER}"
-      - cp test-results.json "/ci-shared/playwright/${CI_REPO_NAME}/build-${CI_BUILD_NUMBER}/summary.json" || true
-      - cp -r playwright-report "/ci-shared/playwright/${CI_REPO_NAME}/build-${CI_BUILD_NUMBER}/playwright-report" || true
+      - ARTIFACT_DIR="repos/${CI_REPO_ID}/builds/${CI_BUILD_NUMBER}/artifacts"
+      - mkdir -p "$ARTIFACT_DIR"
+
+      - cp test-results.json "$ARTIFACT_DIR/summary.json" 2>/dev/null || true
+      - cp -R playwright-report "$ARTIFACT_DIR/" 2>/dev/null || true
+
+
+  upload:
+    image: woodpeckerci/plugin-s3
+    settings:
+      bucket: manaable
+      access_key: manaable
+      secret_key: manaable
+      source: repos/**/*
+      target: repos/
+      path_style: true
+      endpoint: http://192.168.1.15:9001
+
+  # export-artifacts:
+  #   image: alpine
+  #   environment:
+  #       CI_REPO_NAME: ${CI_REPO_NAME}
+  #       CI_BUILD_NUMBER: ${CI_BUILD_NUMBER}
+  #   privileged: true
+  #   volumes:
+  #     - /ci-shared:/ci-shared
+  #   commands:
+  #     - mkdir -p "/ci-shared/playwright/${CI_REPO_NAME}/build-${CI_BUILD_NUMBER}"
+  #     - cp test-results.json "/ci-shared/playwright/${CI_REPO_NAME}/build-${CI_BUILD_NUMBER}/summary.json" || true
+  #     - cp -r playwright-report "/ci-shared/playwright/${CI_REPO_NAME}/build-${CI_BUILD_NUMBER}/playwright-report" || true
 
     depends_on:
       - run-tests
