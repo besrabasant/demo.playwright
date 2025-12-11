@@ -10,7 +10,8 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: [
     ['list'],
-    ['html'],
+    ['html', { open: 'never' }],
+    ['json', { outputFile: '../test-results.json' }],
   ],
   use: {
     actionTimeout: 0,
@@ -21,7 +22,7 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      testIgnore: ['4-*', '5-*'] ,
+      testIgnore: ['4-*', '5-*'],
       use: {
         ...devices['Desktop Chrome'],
       },

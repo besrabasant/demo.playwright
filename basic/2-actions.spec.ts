@@ -1,4 +1,4 @@
-import {test, expect} from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.beforeEach(async ({page}) => {
   await page.goto('https://todomvc.com/examples/javascript-es6/dist/');
@@ -41,7 +41,8 @@ test('element selectors', async ({page}) => {
   await page.click('.todoapp .footer >> text=Completed');
 
   // Selecting based on layout, with css selector
-  expect(await page.innerText('a:right-of(:text("Active"))')).toBe('Completed');
+  // expect(await page.innerText('a:right-of(:text("Active"))')).toBe('Completed');
+  expect(await page.innerText('a:right-of(:text("Active"))')).toBe('Failed');
 
   // Only visible elements, with css selector
   await page.click('text=Completed >> visible=true');

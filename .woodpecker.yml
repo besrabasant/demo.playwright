@@ -11,7 +11,7 @@ steps:
     commands:
       - npm ci || yarn install || pnpm install
       - npx playwright install --with-deps
-      - npx playwright test --config basic/playwright.config.ts --reporter=json,html > test-results.json
+      - npx playwright test --config basic/playwright.config.ts
       - echo $CI_REPO_ID
       - echo $CI_BUILD_NUMBER
       - ARTIFACT_DIR="repos/$CI_REPO_ID/builds/$CI_BUILD_NUMBER/artifacts"
@@ -19,7 +19,7 @@ steps:
 
       - cp test-results.json "$ARTIFACT_DIR/summary.json" 2>/dev/null || true
       - cp -R playwright-report "$ARTIFACT_DIR/" 2>/dev/null || true
-
+    failure: ignore
 
   upload:
     image: woodpeckerci/plugin-s3
@@ -31,6 +31,8 @@ steps:
       target: /
       path_style: true
       endpoint: http://192.168.1.15:9001
+    depends_on:
+      - run-tests
 
   # export-artifacts:
   #   image: alpine
@@ -45,5 +47,3 @@ steps:
   #     - cp test-results.json "/ci-shared/playwright/${CI_REPO_NAME}/build-${CI_BUILD_NUMBER}/summary.json" || true
   #     - cp -r playwright-report "/ci-shared/playwright/${CI_REPO_NAME}/build-${CI_BUILD_NUMBER}/playwright-report" || true
 
-    depends_on:
-      - run-tests
