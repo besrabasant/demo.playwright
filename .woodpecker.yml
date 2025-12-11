@@ -9,6 +9,9 @@ steps:
       - npm ci || yarn install || pnpm install
       - npx playwright install --with-deps
       - npx playwright test --config basic/playwright.config.ts --reporter=json,html
+      # TEMP DEBUG – list again after test run
+      - echo "--- After tests ---"
+      - ls -R .
 
   export-artifacts:
     image: alpine
